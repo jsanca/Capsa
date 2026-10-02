@@ -1,0 +1,115 @@
+schema: osk.workspace/v0alpha1
+blueprint:
+  id: default
+  version: 0.1.5
+# OSK:ROLES:BEGIN
+roles:
+  engineering-reviewer:
+    version: 0.1.0
+    installedPath: .osk/roles/engineering-reviewer
+    fingerprint: 44620fe6fdefdcb05a564db69951557517abe08165c2177a03a812694181c6a3
+    canonicalSHA256: 44620fe6fdefdcb05a564db69951557517abe08165c2177a03a812694181c6a3
+  knowledge-curator:
+    version: 0.1.0
+    installedPath: .osk/roles/knowledge-curator
+    fingerprint: 5c734b7c62a8ebf3f04d5882c316c140cf82dbe89499a34506336c08706f1b7e
+    canonicalSHA256: 5c734b7c62a8ebf3f04d5882c316c140cf82dbe89499a34506336c08706f1b7e
+  platform-engineer:
+    version: 0.1.0
+    installedPath: .osk/roles/platform-engineer
+    fingerprint: 3f0abf9d69c7ed6790a0ad86be48a03b47377b690a9876218c4aa76f8227fada
+    canonicalSHA256: 3f0abf9d69c7ed6790a0ad86be48a03b47377b690a9876218c4aa76f8227fada
+  qa-engineer:
+    version: 0.2.0
+    installedPath: .osk/roles/qa-engineer
+    fingerprint: 6225f6047d73d5943d1794b7553773630d6c296cec77fed2061c5b90f4489d80
+    canonicalSHA256: 6225f6047d73d5943d1794b7553773630d6c296cec77fed2061c5b90f4489d80
+  software-engineer:
+    version: 0.2.0
+    installedPath: .osk/roles/software-engineer
+    fingerprint: 748f2378d3b6a68b4b7e806f47a19423fad84f4746067f0887733af800d841fd
+    canonicalSHA256: 748f2378d3b6a68b4b7e806f47a19423fad84f4746067f0887733af800d841fd
+# OSK:ROLES:END
+# OSK:SKILLS:BEGIN
+skills:
+  osk-adversarial-analysis:
+    version: 0.1.0
+    category: architecture
+    ownership: osk
+    catalogPath: architecture/osk-adversarial-analysis
+    installedPath: .osk/skills/osk-adversarial-analysis
+    fingerprint: 39ac16afcf608098307e3df9cf930118a50cc5e72e379528379fd7a6a208ac89
+    canonicalSHA256: 39ac16afcf608098307e3df9cf930118a50cc5e72e379528379fd7a6a208ac89
+  osk-architecture-review:
+    version: 0.1.0
+    category: architecture
+    ownership: osk
+    catalogPath: architecture/osk-architecture-review
+    installedPath: .osk/skills/osk-architecture-review
+    fingerprint: 1499aab46d5ccd75afe56987832d7d9d509279407fdd3c61e011c02d0f037633
+    canonicalSHA256: 1499aab46d5ccd75afe56987832d7d9d509279407fdd3c61e011c02d0f037633
+  osk-boundary-review:
+    version: 0.1.0
+    category: architecture
+    ownership: osk
+    catalogPath: architecture/osk-boundary-review
+    installedPath: .osk/skills/osk-boundary-review
+    fingerprint: ff4b83f8341947b36b0db1bad28c9ccad439376f5ac822a074f40a0a73ff2dba
+    canonicalSHA256: ff4b83f8341947b36b0db1bad28c9ccad439376f5ac822a074f40a0a73ff2dba
+  osk-code-docs:
+    version: 0.1.0
+    category: documentation
+    ownership: osk
+    catalogPath: documentation/osk-code-docs
+    installedPath: .osk/skills/osk-code-docs
+    fingerprint: 98a3ea38b9a576330542c0ba32c66cdd06848a76defe9a3752dcfc0a97d78d8c
+    canonicalSHA256: 98a3ea38b9a576330542c0ba32c66cdd06848a76defe9a3752dcfc0a97d78d8c
+  osk-engineering-reporting:
+    version: 0.1.2
+    category: process
+    ownership: osk
+    catalogPath: process/osk-engineering-reporting
+    installedPath: .osk/skills/osk-engineering-reporting
+    fingerprint: 6758ae0243b2b3f9da5e30ba0a1d1be8b99d0336ccbf0d37d7eb03ffcb7c5a17
+    canonicalSHA256: 6758ae0243b2b3f9da5e30ba0a1d1be8b99d0336ccbf0d37d7eb03ffcb7c5a17
+  osk-execution-observability:
+    version: 0.1.0
+    category: process
+    ownership: osk
+    catalogPath: process/osk-execution-observability
+    installedPath: .osk/skills/osk-execution-observability
+    fingerprint: 8d140f1d105b0c3b153df8dff85a5a2f2c5bc3497e0582afdcf15a9bbc36f7a0
+    canonicalSHA256: 8d140f1d105b0c3b153df8dff85a5a2f2c5bc3497e0582afdcf15a9bbc36f7a0
+  osk-execution-timebox:
+    version: 0.1.0
+    category: process
+    ownership: osk
+    catalogPath: process/osk-execution-timebox
+    installedPath: .osk/skills/osk-execution-timebox
+    fingerprint: e28573765e6f319d2a5acf2df3ad8da1494347d2b3c78d4c63001bb26160cda3
+    canonicalSHA256: e28573765e6f319d2a5acf2df3ad8da1494347d2b3c78d4c63001bb26160cda3
+  osk-knowledge-curator:
+    version: 0.1.0
+    category: documentation
+    ownership: osk
+    catalogPath: documentation/osk-knowledge-curator
+    installedPath: .osk/skills/osk-knowledge-curator
+    fingerprint: 09504707180cc20ba0abd78b777c4e6268c8e79af990e89de0a3b671696b0fe1
+    canonicalSHA256: 09504707180cc20ba0abd78b777c4e6268c8e79af990e89de0a3b671696b0fe1
+  osk-knowledge-integrity-review:
+    version: 0.1.0
+    category: documentation
+    ownership: osk
+    catalogPath: documentation/osk-knowledge-integrity-review
+    installedPath: .osk/skills/osk-knowledge-integrity-review
+    fingerprint: 096b4dba1d97aca858e9e6eab81df96b9eca64601525d9b0af3f5b61f23d1de5
+    canonicalSHA256: 096b4dba1d97aca858e9e6eab81df96b9eca64601525d9b0af3f5b61f23d1de5
+  osk-verification-engineering:
+    version: 0.1.2
+    category: process
+    ownership: osk
+    catalogPath: process/osk-verification-engineering
+    installedPath: .osk/skills/osk-verification-engineering
+    fingerprint: a76b5a30fd2e9e6cfc3dd8183b8f777d1067d089d011bf3bb0e81c89bf9be2a0
+    canonicalSHA256: a76b5a30fd2e9e6cfc3dd8183b8f777d1067d089d011bf3bb0e81c89bf9be2a0
+# OSK:SKILLS:END
