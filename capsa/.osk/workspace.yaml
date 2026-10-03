@@ -2,6 +2,7 @@ schema: osk.workspace/v0alpha1
 blueprint:
   id: default
   version: 0.1.5
+
 # OSK:ROLES:BEGIN
 roles:
   engineering-reviewer:
@@ -19,6 +20,11 @@ roles:
     installedPath: .osk/roles/platform-engineer
     fingerprint: 3f0abf9d69c7ed6790a0ad86be48a03b47377b690a9876218c4aa76f8227fada
     canonicalSHA256: 3f0abf9d69c7ed6790a0ad86be48a03b47377b690a9876218c4aa76f8227fada
+  product-architect:
+    version: 0.1.0
+    installedPath: .osk/roles/product-architect
+    fingerprint: d2ad25bf122b4d08fbcd2e186b76fa646115711ce6a87c13eb6aece231a1ca5d
+    canonicalSHA256: d2ad25bf122b4d08fbcd2e186b76fa646115711ce6a87c13eb6aece231a1ca5d
   qa-engineer:
     version: 0.2.0
     installedPath: .osk/roles/qa-engineer
@@ -88,6 +94,24 @@ skills:
     installedPath: .osk/skills/osk-execution-timebox
     fingerprint: e28573765e6f319d2a5acf2df3ad8da1494347d2b3c78d4c63001bb26160cda3
     canonicalSHA256: e28573765e6f319d2a5acf2df3ad8da1494347d2b3c78d4c63001bb26160cda3
+  osk-java-guide:
+    version: 0.1.0
+    category: guide/java
+    ownership: osk
+    catalogPath: guide/java/osk-java-guide
+    installedPath: .osk/skills/osk-java-guide
+    fingerprint: 44a447a0c25e2e605856fa4e989507bcc1cd6161d188acf4480e7069d57ee94f
+    canonicalSHA256: 44a447a0c25e2e605856fa4e989507bcc1cd6161d188acf4480e7069d57ee94f
+    adapters:
+      agents: installed
+      claude-code: installed
+      codex: installed
+      opencode: installed
+    adapterSHA256:
+      agents: 61e82aaeedbddafdb5ae448b9598a130e312f91af1399ce41b63802e5f053594
+      claude-code: b9f5eedfb12c21bf7f844958f5cea30b05fbd3eabd10941b2da9f3bde2bd7f41
+      codex: 0f55037c1284c126c39f8d2a690cde9e39ce8199072ecb8ea7b835bedb3c2f83
+      opencode: 52e42787f1d6305b186fe29ee13e7f2457c49140b4bf74e88873605d51651d18
   osk-knowledge-curator:
     version: 0.1.0
     category: documentation
