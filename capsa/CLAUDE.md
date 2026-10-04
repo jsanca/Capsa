@@ -30,7 +30,10 @@ Read:
 ./mvnw test
 
 # Run a single test class
-./mvnw test -Dtest=GreetingResourceTest
+./mvnw test -Dtest=CaptureResourceTest
+
+# Run one module's tests
+./mvnw -pl capsa-capture test
 
 # Run integration tests (skipped by default)
 ./mvnw verify -DskipITs=false
@@ -39,27 +42,36 @@ Read:
 ./mvnw package -Dnative
 ```
 
+Java 25 is required (`maven.compiler.release=25`). `./mvnw` bootstraps Maven 3.9.16 but **not** the JDK.
+
 ## Architecture
 
 Capsa is a personal capture-and-classification system. Raw text (or other input) enters as a **Capture**, Capsa classifies it against the user's semantic **Lists**, and produces an **Item** in the correct list. When confidence is low Capsa surfaces the ambiguity to the user instead of silently guessing.
 
-The backend is a **modular monolith** targeting Java 25 + Quarkus 3. The intended layering:
+The backend is a **modular monolith** (Java 25 + Quarkus 3) organized by business capability. See [docs/knowledge/architecture/capsa-arch-001-modular-monolith-v0.1.md](docs/knowledge/architecture/capsa-arch-001-modular-monolith-v0.1.md) for the current architecture reference.
 
-- **Domain** — pure Java, no Quarkus dependency; contains entities (`User`, `List`, `Capture`, `Item`, `Classification`) and use-case logic.
-- **Application** — orchestrates use cases; also framework-free where practical.
-- **Infrastructure/Adapter** — Quarkus, Jakarta REST, PostgreSQL (Flyway migrations), and classifier providers. Quarkus acts as the runtime and wires infrastructure to the domain.
+Seven modules form one deployable artifact:
 
-JPMS module boundaries are intended to enforce this separation, but are not yet in place.
+- `capsa-observability`, `capsa-users`, `capsa-lists`, `capsa-items`, `capsa-capture`, `capsa-classification` — capability modules (`jar` packaging).
+- `capsa-runtime` — the **only** module with `<packaging>quarkus</packaging>` and the Quarkus Maven plugin. It produces the deployable artifact and wires everything together (Jakarta REST resources, OIDC, exception mappers, Flyway, integration tests).
 
 **Classification is an abstraction**, not a provider. The domain must not depend on any specific AI/LLM/rules implementation. The adapter layer owns classifier wiring.
 
-**Planned testing layers** (not yet implemented beyond the scaffold):
-- Domain → JUnit unit tests
-- Application → use-case tests
-- API → Karate contract/integration tests
-- Persistence → PostgreSQL tests via Testcontainers
+## Module Layout and JPMS
 
-The current codebase is a Quarkus scaffold. Domain implementation begins after v0.1 use cases are refined (see `docs/engineering/agents/intent/intent1.md`).
+Every module is also a JPMS module (`src/main/java/module-info.java`). The package pattern:
+
+```text
+com.capsa.<capability>.api                              # exported: public contract
+com.capsa.<capability>.internal.domain                  # not exported
+com.capsa.<capability>.internal.service                 # opens for CDI
+com.capsa.<capability>.internal.persistence.entity     # opens for Hibernate
+com.capsa.<capability>.internal.persistence.repository # opens for CDI
+```
+
+Cross-capability collaboration goes through `com.capsa.<other>.api` only — never another capability's repository or service implementation. A capability is the sole owner of its own tables. `opens` are deliberately targeted; do not blanket-open packages.
+
+`capsa-runtime` is an `open module` that requires every capability and the Jakarta/CDI/MicroProfile JWT/SLF4J APIs it touches directly.
 
 ## Dependency Injection
 
@@ -78,9 +90,25 @@ public ItemServiceImpl(ItemRepository itemRepository, ListService listService) {
 }
 ```
 
-Jakarta REST resources are **exempt** from this convention — their `@Inject` field style is intentional and should not be mechanically rewritten.
+Jakarta REST resources are **exempt** from this convention — their `@Inject` field style in `capsa-runtime` is intentional and should not be mechanically rewritten.
 
-Constructor injection makes required dependencies explicit, keeps collaborators immutable after construction, enables direct unit-test construction without CDI or reflection, and makes dependency growth visible at the constructor signature.
+## Persistence and OIDC
+
+- Database: PostgreSQL via Flyway; Hibernate ORM with `quarkus.hibernate-orm.database.generation=none` (Flyway owns the schema).
+- Migrations live only in `capsa-runtime/src/main/resources/db/migration/Vxxx__*.sql`.
+- OIDC: `quarkus.oidc.auth-server-url=${CAPSA_OIDC_AUTH_SERVER_URL:}` and `quarkus.oidc.client-id=${CAPSA_OIDC_CLIENT_ID:capsa}` — both must be set in production. Both are disabled in `%dev` and `%test` profiles.
+- Integration tests live in `capsa-runtime/src/test/java` and use `@QuarkusTest` + RestAssured + `@TestSecurity` (OIDC is off in `%test`).
+
+## Adding a New Capability
+
+When adding a new capability module, mirror the CDI force-indexing block in `application.properties`:
+
+```properties
+quarkus.index-dependency.<name>.group-id=com.capsa
+quarkus.index-dependency.<name>.artifact-id=capsa-<name>
+```
+
+Without this, Quarkus will not discover the capability's beans and entities.
 
 ## Tool-Specific Instructions
 
