@@ -19,12 +19,18 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.UUID;
 
 @Path("/capsa/api/items")
 @RequestScoped
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class ItemResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ItemResource.class);
 
     @Inject
     CurrentUser currentUser;
@@ -36,14 +42,20 @@ public class ItemResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response create(final CreateItemCommand command) {
         if (command == null || command.listId() == null) {
+            LOG.warn("Rejecting item creation: missing listId (userId={})", currentUser.userId().value());
             return Response.status(422).entity("{\"code\":\"CAPSA_VALIDATION_ERROR\",\"message\":\"listId is required\"}").build();
         }
 
         if (command.name() == null || command.name().isBlank()) {
+            LOG.warn("Rejecting item creation: missing or blank name (userId={} listId={})",
+                currentUser.userId().value(), command.listId());
             return Response.status(422).entity("{\"code\":\"CAPSA_VALIDATION_ERROR\",\"message\":\"name is required\"}").build();
         }
 
+        LOG.info("POST /capsa/api/items userId={} listId={} nameLength={}",
+            currentUser.userId().value(), command.listId(), command.name().length());
         final ItemView item = itemService.create(currentUser.userId(), command);
+        LOG.debug("Created item itemId={} listId={}", item.itemId().value(), item.listId());
         return Response.status(201).entity(item).build();
     }
 
@@ -53,9 +65,12 @@ public class ItemResource {
             @QueryParam("status") @DefaultValue("active") final String statusParam
     ) {
         if (listId == null) {
+            LOG.warn("Rejecting items query: missing listId (userId={})", currentUser.userId().value());
             return Response.status(422).entity("{\"code\":\"CAPSA_VALIDATION_ERROR\",\"message\":\"listId is required\"}").build();
         }
 
+        LOG.info("GET /capsa/api/items userId={} listId={} status={}",
+            currentUser.userId().value(), listId, statusParam);
         final ItemStatusFilter filter = switch (statusParam.toLowerCase()) {
             case "history" -> ItemStatusFilter.HISTORY;
             case "all"     -> ItemStatusFilter.ALL;
@@ -67,6 +82,7 @@ public class ItemResource {
     @PUT
     @Path("/{id}/completion")
     public ItemView complete(@PathParam("id") final UUID id) {
+        LOG.info("PUT /capsa/api/items/{}/completion userId={}", id, currentUser.userId().value());
         return itemService.complete(currentUser.userId(), new com.capsa.items.api.ItemId(id));
     }
 }

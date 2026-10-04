@@ -29,4 +29,6 @@ This file is the compact, current index of material engineering work. Detailed t
 
 | S-06 | Error Model + OIDC Hardening | DONE | S-05 | — | [report](agents/reports/S-06-report.md) | — | — | — |
 
+| CAPSA-OBS-001 | Observability Event Foundation | DONE | S-06 | — | [report](agents/reports/CAPSA-OBS-001-report.md) | — | — | [observability knowledge](../knowledge/observability/capsa-obs-001-observability-event-foundation.md) |
+
 Use `—` where a relationship does not exist. Keep cells brief; the linked durable record carries evidence, limitations, unresolved issues, and validation. Add a knowledge link when work establishes or changes reusable current understanding.

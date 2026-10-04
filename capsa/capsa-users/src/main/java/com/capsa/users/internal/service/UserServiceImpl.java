@@ -9,9 +9,13 @@ import com.capsa.users.internal.persistence.repository.UserRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ApplicationScoped
 public class UserServiceImpl implements UserService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepository;
 
@@ -32,6 +36,7 @@ public class UserServiceImpl implements UserService {
                 var user = User.create(oidcSubject, email, name);
                 var entity = UserConverter.toEntity(user);
                 userRepository.save(entity);
+                LOG.info("Provisioned new user userId={}", user.id());
                 return UserConverter.toView(entity);
             });
     }
@@ -39,9 +44,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
     public UserView findById(final UserId userId) {
-
-        return userRepository.findById(userId.value())
-            .map(UserConverter::toView)
-            .orElseThrow(() -> new UserNotFoundException("User not found: " + userId.value()));
+        try {
+            return userRepository.findById(userId.value())
+                .map(UserConverter::toView)
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + userId.value()));
+        } catch (UserNotFoundException ex) {
+            LOG.debug("User lookup miss userId={}", userId.value());
+            throw ex;
+        }
     }
 }

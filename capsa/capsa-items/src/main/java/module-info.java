@@ -8,9 +8,11 @@ module capsa.items {
 
     requires capsa.users;
     requires capsa.lists;
+    requires capsa.observability;
     requires jakarta.inject;
     requires jakarta.cdi;
     requires jakarta.persistence;
     requires jakarta.transaction;
     requires jakarta.ws.rs;
+    requires org.slf4j;
 }

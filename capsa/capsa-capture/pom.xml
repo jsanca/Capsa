@@ -8,11 +8,14 @@
     </parent>
     <artifactId>capsa-capture</artifactId>
 
-    <dependencies>
+<dependencies>
         <dependency>
             <groupId>com.capsa</groupId>
             <artifactId>capsa-users</artifactId>
-            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.capsa</groupId>
+            <artifactId>capsa-observability</artifactId>
         </dependency>
         <dependency>
             <groupId>com.capsa</groupId>
@@ -49,6 +52,10 @@
         <dependency>
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <dependency>

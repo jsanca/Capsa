@@ -13,10 +13,14 @@ import com.capsa.lists.api.ListId;
 import com.capsa.users.api.UserId;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.List;
 
 @ApplicationScoped
 public class CaptureServiceImpl implements CaptureService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CaptureServiceImpl.class);
 
     private final CaptureCreationService captureCreationService;
     private final CaptureResolutionService captureResolutionService;
@@ -35,6 +39,8 @@ public class CaptureServiceImpl implements CaptureService {
     @Override
     public CaptureResult submit(UserId userId, String content) {
         final String normalized = CaptureNormalizer.normalize(content);
+        LOG.debug("Normalized capture content userId={} originalLength={} normalizedLength={}",
+            userId.value(), content.length(), normalized.length());
 
         final Capture capture = captureCreationService.createCapture(userId, content, normalized);
 
@@ -42,10 +48,13 @@ public class CaptureServiceImpl implements CaptureService {
         try {
             result = classifier.classify(new ClassificationRequest(userId, normalized, List.of()));
         } catch (Exception e) {
+            LOG.error("Classification pipeline failed; marking capture FAILED captureId={} userId={}",
+                capture.captureId(), userId.value(), e);
             captureResolutionService.markFailed(capture.captureId());
             throw e;
         }
 
+        LOG.debug("Classification outcome captureId={} outcome={}", capture.captureId(), result.outcome());
         return switch (result.outcome()) {
             case CLASSIFIED -> {
                 final ItemView item = captureResolutionService.resolveCapture(userId, capture, result);
@@ -63,6 +72,7 @@ public class CaptureServiceImpl implements CaptureService {
 
     @Override
     public ItemView resolve(UserId userId, CaptureId captureId, ListId listId) {
+        LOG.debug("Resolving capture captureId={} listId={} userId={}", captureId.value(), listId.value(), userId.value());
         return captureResolutionService.resolveFromUser(userId, captureId, listId);
     }
 }

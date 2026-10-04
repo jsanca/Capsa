@@ -5,10 +5,14 @@ import com.capsa.users.api.UserId;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 @ApplicationScoped
 public class ClassificationMemoryEntryRepository {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ClassificationMemoryEntryRepository.class);
 
     private final EntityManager em;
 
@@ -22,6 +26,8 @@ public class ClassificationMemoryEntryRepository {
     }
 
     public Optional<ClassificationMemoryEntryEntity> findLatestUserConfirmed(UserId userId, String normalizedContent) {
+        LOG.debug("findLatestUserConfirmed userId={} contentLength={}",
+            userId.value(), normalizedContent == null ? 0 : normalizedContent.length());
         var results = em.createQuery(
                 "SELECT e FROM ClassificationMemoryEntryEntity e " +
                 "WHERE e.userId = :userId AND e.normalizedContent = :content AND e.source = 'USER_CONFIRMED' " +
@@ -31,10 +37,14 @@ public class ClassificationMemoryEntryRepository {
             .setParameter("content", normalizedContent)
             .setMaxResults(1)
             .getResultList();
-        return results.isEmpty() ? Optional.empty() : Optional.of(results.getFirst());
+        final boolean hit = !results.isEmpty();
+        LOG.debug("findLatestUserConfirmed userId={} hit={}", userId.value(), hit);
+        return hit ? Optional.of(results.getFirst()) : Optional.empty();
     }
 
     public void save(ClassificationMemoryEntryEntity entity) {
         em.persist(entity);
+        LOG.debug("persisted classification memory entry entryId={} userId={} selectedListId={}",
+            entity.getId(), entity.getUserId(), entity.getSelectedListId());
     }
 }

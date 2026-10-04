@@ -11,4 +11,5 @@ module capsa.users {
     requires jakarta.cdi;
     requires jakarta.persistence;
     requires jakarta.transaction;
+    requires org.slf4j;
 }

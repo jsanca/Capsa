@@ -31,6 +31,10 @@
             <groupId>com.capsa</groupId>
             <artifactId>capsa-classification</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.capsa</groupId>
+            <artifactId>capsa-observability</artifactId>
+        </dependency>
         <!-- Quarkus core -->
         <dependency>
             <groupId>io.quarkus</groupId>

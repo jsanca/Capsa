@@ -10,9 +10,11 @@ module capsa.capture {
     requires capsa.lists;
     requires capsa.items;
     requires capsa.classification;
+    requires capsa.observability;
     requires jakarta.inject;
     requires jakarta.cdi;
     requires jakarta.persistence;
     requires jakarta.transaction;
     requires jakarta.ws.rs;
+    requires org.slf4j;
 }

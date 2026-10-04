@@ -8,10 +8,14 @@
     </parent>
     <artifactId>capsa-lists</artifactId>
 
-    <dependencies>
+<dependencies>
         <dependency>
             <groupId>com.capsa</groupId>
             <artifactId>capsa-users</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.capsa</groupId>
+            <artifactId>capsa-observability</artifactId>
         </dependency>
         <dependency>
             <groupId>jakarta.inject</groupId>
@@ -33,6 +37,11 @@
             <groupId>jakarta.ws.rs</groupId>
             <artifactId>jakarta.ws.rs-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
