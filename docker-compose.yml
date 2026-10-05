@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: capsa
+      POSTGRES_USER: capsa
+      POSTGRES_PASSWORD: capsa
+    ports:
+      - "5432:5432"
+    volumes:
+      - capsa-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U capsa"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  capsa:
+    image: capsa:latest
+    build:
+      context: server/capsa-runtime
+      dockerfile: src/main/docker/Dockerfile.jvm
+    ports:
+      - "8080:8080"
+    environment:
+      CAPSA_DB_URL: jdbc:postgresql://postgres:5432/capsa
+      CAPSA_DB_USER: capsa
+      CAPSA_DB_PASSWORD: capsa
+      # docker-dev profile disables OIDC (build-time flag). To test with a real provider
+      # set QUARKUS_PROFILE=prod and supply CAPSA_OIDC_AUTH_SERVER_URL in your .env file.
+      QUARKUS_PROFILE: ${QUARKUS_PROFILE:-docker-dev}
+      CAPSA_OIDC_CLIENT_ID: ${CAPSA_OIDC_CLIENT_ID:-capsa}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  capsa-pgdata:
