@@ -49,4 +49,8 @@ This file is the compact, current index of material engineering work. Detailed t
 
 | CAPSA-AUTH-BE-001 | OIDC identity model correction `(issuer, subject)`, `Role` system, concurrency-safe provisioning, `capsa-bootstrap` module with atomic first-admin claim | DONE | CAPSA-ARCH-REVIEW-003 | — | [report](agents/reports/CAPSA-AUTH-BE-001-report.md) | — | — | — |
 
+| CAPSA-ARCH-REVIEW-004 | Integration review — auth bootstrap backend/frontend vs CAPSA-ARCH-REVIEW-003 | DONE | CAPSA-AUTH-BE-001, CAPSA-AUTH-FE-001 | — | [report](agents/reports/CAPSA-ARCH-REVIEW-004.md) | — | — | — |
+
+| CAPSA-AUTH-FIX-001 | Post-review hardening: `CAPSA_BOOTSTRAP_TOKEN` deployment wiring, first-claim concurrency test, `bootstrap-closed` gate state, `CAPSA_BOOTSTRAP_INVALID_TOKEN` error code, stale artifact removal | DONE | CAPSA-ARCH-REVIEW-004 | — | [report](agents/reports/CAPSA-AUTH-FIX-001-report.md) | — | — | — |
+
 Use `—` where a relationship does not exist. Keep cells brief; the linked durable record carries evidence, limitations, unresolved issues, and validation. Add a knowledge link when work establishes or changes reusable current understanding.

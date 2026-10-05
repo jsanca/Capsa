@@ -1,6 +1,10 @@
 package com.capsa.runtime;
 
+import com.capsa.bootstrap.api.BootstrapAlreadyClaimedException;
 import com.capsa.bootstrap.api.BootstrapService;
+import com.capsa.bootstrap.api.ClaimBootstrapCommand;
+import com.capsa.users.api.ExternalIdentity;
+import com.capsa.users.api.Role;
 import com.capsa.users.api.UserService;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
@@ -16,6 +20,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.*;
@@ -51,22 +57,15 @@ class BootstrapResourceTest {
             .then()
             .statusCode(200)
             .extract().asString();
-        // Response must not contain token-related fields
         org.junit.jupiter.api.Assertions.assertFalse(body.contains("token"));
         org.junit.jupiter.api.Assertions.assertFalse(body.contains("secret"));
         org.junit.jupiter.api.Assertions.assertFalse(body.contains("configured"));
     }
 
-    // TC-BOOTSTRAP-007: missing authentication returns 401
+    // TC-BOOTSTRAP-007: missing authentication returns 401/403
     @Test
     @Order(3)
     void noAuth_returns401() {
-        // In test mode OIDC is disabled, but @TestSecurity is NOT present here.
-        // Quarkus test security without @TestSecurity on an authenticated endpoint → 401.
-        // Note: if OIDC is fully disabled in test mode (no security), this might return 403 instead.
-        // The important thing is that the bootstrap state is NOT changed.
-        // We deliberately send a wrong token here so that even if auth is not enforced
-        // in test mode, the invalid token produces 403 and does NOT claim bootstrap.
         given()
             .contentType(ContentType.JSON)
             .body("{\"token\":\"definitely-not-the-right-token\"}")
@@ -88,34 +87,64 @@ class BootstrapResourceTest {
             .statusCode(403)
             .body("code", is("CAPSA_BOOTSTRAP_INVALID_TOKEN"));
 
-        // State must not have changed
         given()
             .when().get("/capsa/api/bootstrap/status")
             .then()
             .body("required", is(true));
     }
 
-    // TC-BOOTSTRAP-014: no owner email needed — bootstrap is identity-driven
-    // TC-BOOTSTRAP-005: valid bootstrap creates exactly one ADMIN
+    // TC-BOOTSTRAP-015: concurrent first claims — exactly one ADMIN emerges
+    //
+    // N threads each present a distinct identity and the valid token simultaneously.
+    // The database-level ON CONFLICT DO NOTHING guarantee enforces the singleton:
+    // exactly one claim succeeds; all others see BootstrapAlreadyClaimedException.
+    // After this test, bootstrap is claimed for the remainder of the test run.
     @Test
     @Order(5)
-    @TestSecurity(user = "bootstrap-first-admin")
-    void validBootstrap_createsAdmin_returns201() {
-        given()
-            .contentType(ContentType.JSON)
-            .body("{\"token\":\"test-bootstrap-token\"}")
-            .when().post("/capsa/api/bootstrap")
-            .then()
-            .statusCode(201)
-            .body("required", is(false))
-            .body("claimedAt", notNullValue());
+    @TestSecurity(user = "concurrency-orchestrator")
+    void firstClaimConcurrency_exactlyOneAdminEmerges() throws Exception {
+        int n = 4;
+        var latch = new CountDownLatch(1);
+        var executor = Executors.newFixedThreadPool(n);
+        var command = new ClaimBootstrapCommand("test-bootstrap-token");
 
-        // Verify the user now has ADMIN role
-        // In test mode @TestSecurity principal is not a JWT, so issuer resolves to "unknown"
-        var user = userService.findOrProvision(
-            "unknown", "bootstrap-first-admin",
-            "admin@example.com", "First Admin");
-        assertEquals(com.capsa.users.api.Role.ADMIN, user.role());
+        var identities = IntStream.range(0, n)
+            .mapToObj(i -> new ExternalIdentity(
+                "https://test.example",
+                "concurrent-claimer-" + i,
+                "claimer" + i + "@test.example",
+                "Concurrent Claimer " + i))
+            .toList();
+
+        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+        for (var identity : identities) {
+            futures.add(CompletableFuture.supplyAsync(() -> {
+                try {
+                    latch.await();
+                    bootstrapService.claim(identity, command);
+                    return true;
+                } catch (BootstrapAlreadyClaimedException ignored) {
+                    return false;
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return false;
+                }
+            }, executor));
+        }
+
+        latch.countDown();
+        executor.shutdown();
+        executor.awaitTermination(10, TimeUnit.SECONDS);
+
+        var results = futures.stream().map(CompletableFuture::join).toList();
+        long successCount = results.stream().filter(b -> b).count();
+        assertEquals(1, successCount, "Exactly one concurrent first claim must succeed");
+
+        long adminCount = identities.stream()
+            .map(id -> userService.findOrProvision(id.issuer(), id.subject(), id.email(), id.displayName()))
+            .filter(u -> u.role() == Role.ADMIN)
+            .count();
+        assertEquals(1, adminCount, "Exactly one ADMIN must exist after concurrent first claims");
     }
 
     // TC-BOOTSTRAP-012: status returns required=false after successful claim
@@ -144,15 +173,11 @@ class BootstrapResourceTest {
             .body("code", is("CAPSA_BOOTSTRAP_ALREADY_CLAIMED"));
     }
 
-    // TC-BOOTSTRAP-009: concurrent bootstrap produces exactly one success
+    // TC-BOOTSTRAP-009: concurrent already-claimed bootstrap — all return 409
     @Test
     @Order(8)
     @TestSecurity(user = "concurrent-bootstrap-user")
-    void concurrentBootstrap_exactlyOneSucceeds() throws Exception {
-        // Bootstrap already claimed at order 5. This tests idempotency under concurrency.
-        // All requests should get 409 (since already claimed).
-        // For true first-claim concurrency, the ON CONFLICT DO NOTHING guarantee is
-        // validated by the DB constraint — tested here as sequential 409s.
+    void concurrentAlreadyClaimed_allReturn409() throws Exception {
         int n = 3;
         var latch = new CountDownLatch(1);
         var executor = Executors.newFixedThreadPool(n);
@@ -173,7 +198,6 @@ class BootstrapResourceTest {
         executor.shutdown();
 
         var results = futures.stream().map(CompletableFuture::join).toList();
-        // All should be 409 since bootstrap was already claimed
         results.forEach(status -> assertEquals(409, status, "Expected 409 for already-claimed bootstrap"));
     }
 }

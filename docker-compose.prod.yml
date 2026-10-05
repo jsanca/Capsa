@@ -24,6 +24,9 @@ services:
       CAPSA_DB_PASSWORD: ${CAPSA_DB_PASSWORD}
       CAPSA_OIDC_AUTH_SERVER_URL: ${CAPSA_OIDC_AUTH_SERVER_URL}
       CAPSA_OIDC_CLIENT_ID: ${CAPSA_OIDC_CLIENT_ID:-capsa}
+      # One-time bootstrap secret. Required on first deployment; inert after bootstrap.
+      # Set as a secret in Coolify — never hardcode.
+      CAPSA_BOOTSTRAP_TOKEN: ${CAPSA_BOOTSTRAP_TOKEN}
     depends_on:
       postgres:
         condition: service_healthy
