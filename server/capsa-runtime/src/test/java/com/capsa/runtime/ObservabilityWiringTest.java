@@ -25,7 +25,7 @@ class ObservabilityWiringTest {
     @Test
     @TestSecurity(user = "obs-u01")
     void listCreateEmitsAndReturnsBusinessResult() {
-        var user = userService.findOrProvision("obs-u01", "obs01@example.com", "Obs U01");
+        var user = userService.findOrProvision("https://test.provider.example", "obs-u01", "obs01@example.com", "Obs U01");
         var list = listService.create(user.userId(), new CreateListCommand("Observability smoke", null));
         assertNotNull(list.listId());
     }

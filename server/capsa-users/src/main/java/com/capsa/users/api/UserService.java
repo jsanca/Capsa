@@ -1,32 +1,39 @@
 package com.capsa.users.api;
 
 /**
- * Capability for provisioning and looking up {@link UserView} records.
- *
- * <p>Implementations bridge the OIDC authentication context and the
- * {@code User} aggregate. The provisioning step is idempotent on
- * {@code oidcSubject}: a second call for the same subject returns the
- * existing {@code UserView}.
+ * Capability for provisioning and looking up User records.
+ * Provisioning is atomic and concurrency-safe via database-level conflict resolution.
  */
 public interface UserService {
 
     /**
-     * Returns the {@code UserView} for {@code oidcSubject}, creating one if
-     * none exists. Used at the boundary of an authenticated request to bind
-     * the external identity to the internal {@code User} aggregate.
+     * Returns the UserView for the given (issuer, subject) pair, creating one if
+     * none exists. Concurrent calls for the same pair resolve to the same User.
+     * New users are provisioned with role {@link Role#USER}.
      *
-     * @param oidcSubject the OIDC subject claim; non-blank
-     * @param email       email from the identity provider; non-blank
-     * @param name        display name from the identity provider; may be {@code null}
-     * @return the existing or newly-provisioned {@code UserView}
+     * @param issuer  OIDC issuer claim; non-blank
+     * @param subject OIDC subject claim; non-blank
+     * @param email   email from identity provider; non-blank
+     * @param name    display name; may be {@code null}
+     * @return the existing or newly-provisioned UserView
      */
-    UserView findOrProvision(String oidcSubject, String email, String name);
+    UserView findOrProvision(String issuer, String subject, String email, String name);
 
     /**
-     * Looks up a {@code UserView} by its internal id.
+     * Assigns the given role to an existing User. Must be called within an active
+     * transaction (caller owns transactional scope).
+     *
+     * @param userId target user identifier
+     * @param role   role to assign
+     * @throws UserNotFoundException if no user exists with that id
+     */
+    void assignRole(UserId userId, Role role);
+
+    /**
+     * Looks up a UserView by internal id.
      *
      * @param userId the internal user identifier
-     * @return the matching {@code UserView}
+     * @return the matching UserView
      * @throws UserNotFoundException if no user exists with that id
      */
     UserView findById(UserId userId);

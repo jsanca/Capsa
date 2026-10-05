@@ -39,4 +39,14 @@ This file is the compact, current index of material engineering work. Detailed t
 
 | CAPSA-REPO-001 | Promote Capsa root workspace; rename `capsa/` Quarkus project to `server/`; scaffold `android/`, `ios/`, `web/`, `mcp/` boundaries | DONE | S-07 | — | [report](agents/reports/CAPSA-REPO-001.md) | — | — | — |
 
+| CAPSA-SETUP-BE-001 | Initial Setup REST API — `capsa-setup` capability module, `GET /api/setup/status`, `POST /api/setup`, idempotency, atomic initialization | DONE | CAPSA-REPO-001 | — | [report](agents/reports/CAPSA-SETUP-BE-001-report.md) | — | — | — |
+
+| CAPSA-WEB-001 | Bootstrap React admin UI + invitation creation under `/admin-ui` | DONE | CAPSA-REPO-001 | [task](agents/tasks/CAPSA-WEB-001.md) | [report](agents/reports/CAPSA-WEB-001-report.md) | — | — | — |
+
+| CAPSA-ARCH-REVIEW-003 | Architecture review — admin UI, initial setup, and first-admin bootstrap | DONE | CAPSA-SETUP-BE-001, CAPSA-WEB-001 | — | [report](agents/reports/CAPSA-ARCH-REVIEW-003.md) | — | — | — |
+
+| CAPSA-AUTH-FE-001 | Admin bootstrap gate and authentication-client seam | DONE | CAPSA-ARCH-REVIEW-003 | [task](agents/tasks/CAPSA-AUTH-FE-001.md) | [report](agents/reports/CAPSA-AUTH-FE-001-report.md) | — | — | — |
+
+| CAPSA-AUTH-BE-001 | OIDC identity model correction `(issuer, subject)`, `Role` system, concurrency-safe provisioning, `capsa-bootstrap` module with atomic first-admin claim | DONE | CAPSA-ARCH-REVIEW-003 | — | [report](agents/reports/CAPSA-AUTH-BE-001-report.md) | — | — | — |
+
 Use `—` where a relationship does not exist. Keep cells brief; the linked durable record carries evidence, limitations, unresolved issues, and validation. Add a knowledge link when work establishes or changes reusable current understanding.

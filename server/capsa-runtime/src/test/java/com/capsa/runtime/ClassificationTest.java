@@ -31,7 +31,7 @@ class ClassificationTest {
     @Test
     @TestSecurity(user = "classify-test-sub-001")
     void recordThenClassify_returnsClassified() {
-        var user = userService.findOrProvision("classify-test-sub-001", "classify001@example.com", "Classify User 1");
+        var user = userService.findOrProvision("https://test.provider.example", "classify-test-sub-001", "classify001@example.com", "Classify User 1");
         UserId userId = user.userId();
         UUID listId = UUID.randomUUID();
         String content = "buy groceries";
@@ -48,12 +48,12 @@ class ClassificationTest {
     @Test
     @TestSecurity(user = "classify-test-sub-002")
     void differentUser_sameContent_returnsNeedsResolution() {
-        var userA = userService.findOrProvision("classify-test-sub-002", "classifyA@example.com", "Classify User A");
+        var userA = userService.findOrProvision("https://test.provider.example", "classify-test-sub-002", "classifyA@example.com", "Classify User A");
         UUID listId = UUID.randomUUID();
         String content = "shared content";
         classificationService.recordResolution(userA.userId(), content, listId);
 
-        var userB = userService.findOrProvision("classify-test-sub-003", "classifyB@example.com", "Classify User B");
+        var userB = userService.findOrProvision("https://test.provider.example", "classify-test-sub-003", "classifyB@example.com", "Classify User B");
         var request = new ClassificationRequest(userB.userId(), content, List.of());
         var result = classifier.classify(request);
 

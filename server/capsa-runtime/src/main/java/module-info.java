@@ -1,5 +1,6 @@
 open module capsa.runtime {
     requires capsa.users;
+    requires capsa.bootstrap;
     requires capsa.lists;
     requires capsa.items;
     requires capsa.capture;

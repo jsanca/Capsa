@@ -9,6 +9,7 @@
     <modules>
         <module>capsa-observability</module>
         <module>capsa-users</module>
+        <module>capsa-bootstrap</module>
         <module>capsa-lists</module>
         <module>capsa-items</module>
         <module>capsa-capture</module>
@@ -40,6 +41,11 @@
             <dependency>
                 <groupId>com.capsa</groupId>
                 <artifactId>capsa-users</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.capsa</groupId>
+                <artifactId>capsa-bootstrap</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

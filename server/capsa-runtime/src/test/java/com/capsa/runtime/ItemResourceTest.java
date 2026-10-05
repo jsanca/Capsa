@@ -133,7 +133,7 @@ class ItemResourceTest {
     @Test
     @TestSecurity(user = "item-u06b")
     void addItemToAnotherUsersListFails() {
-        var userA = userService.findOrProvision("item-u06a", "u06a@test.com", "User A");
+        var userA = userService.findOrProvision("unknown", "item-u06a", "u06a@test.com", "User A");
         var listA = listService.create(userA.userId(), new CreateListCommand("User A Private", null));
 
         given()
@@ -218,7 +218,7 @@ class ItemResourceTest {
     @Test
     @TestSecurity(user = "item-u11b")
     void getItemsFromAnotherUsersListFails() {
-        var userA = userService.findOrProvision("item-u11a", "u11a@test.com", "User A Items");
+        var userA = userService.findOrProvision("unknown", "item-u11a", "u11a@test.com", "User A Items");
         var listA = listService.create(userA.userId(), new CreateListCommand("User A Items List", null));
 
         given()
@@ -263,7 +263,7 @@ class ItemResourceTest {
     @Test
     @TestSecurity(user = "item-u14b")
     void completeAnotherUsersItemFails() {
-        var userA = userService.findOrProvision("item-u14a", "u14a@test.com", "User A Completion");
+        var userA = userService.findOrProvision("unknown", "item-u14a", "u14a@test.com", "User A Completion");
         var listA = listService.create(userA.userId(), new CreateListCommand("User A Completion List", null));
         var itemA = itemService.create(userA.userId(), new CreateItemCommand(listA.listId().value(), "Secret Item", null));
 

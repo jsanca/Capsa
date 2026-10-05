@@ -78,7 +78,7 @@ class CaptureResourceTest {
     @Test
     @TestSecurity(user = "cap-u03")
     void submitKnownContent_returnsClassifiedWith201AndItem() {
-        var user = userService.findOrProvision("cap-u03", "cap-u03@example.com", "Cap U03");
+        var user = userService.findOrProvision("unknown", "cap-u03", "cap-u03@example.com", "Cap U03");
         var listId = UUID.fromString(createList("Shopping 03"));
 
         classificationService.recordResolution(user.userId(), "buy soap for the shower", listId);
@@ -112,7 +112,7 @@ class CaptureResourceTest {
     @Test
     @TestSecurity(user = "cap-u05")
     void submitKnownContent_itemBelongsToCorrectList() {
-        var user = userService.findOrProvision("cap-u05", "cap-u05@example.com", "Cap U05");
+        var user = userService.findOrProvision("unknown", "cap-u05", "cap-u05@example.com", "Cap U05");
         var listId = UUID.fromString(createList("Groceries 05"));
 
         classificationService.recordResolution(user.userId(), "milk and eggs", listId);
@@ -130,7 +130,7 @@ class CaptureResourceTest {
     @Test
     @TestSecurity(user = "cap-u06")
     void differentUser_sameKnownContent_returnsNeedsResolution() {
-        var userA = userService.findOrProvision("cap-u06a", "cap-u06a@example.com", "Cap U06A");
+        var userA = userService.findOrProvision("unknown", "cap-u06a", "cap-u06a@example.com", "Cap U06A");
         var listId = UUID.randomUUID();
         classificationService.recordResolution(userA.userId(), "learn quarkus", listId);
 
@@ -217,7 +217,7 @@ class CaptureResourceTest {
     @Test
     @TestSecurity(user = "cap-u10")
     void resolveClassifiedCapture_returns409() {
-        var user = userService.findOrProvision("cap-u10", "cap-u10@example.com", "Cap U10");
+        var user = userService.findOrProvision("unknown", "cap-u10", "cap-u10@example.com", "Cap U10");
         var listId = UUID.fromString(createList("Classified List 10"));
         classificationService.recordResolution(user.userId(), "already classified content u10", listId);
 
@@ -264,7 +264,7 @@ class CaptureResourceTest {
     @Test
     @TestSecurity(user = "cap-u12")
     void afterUserResolution_sameContentClassifiesAutomatically() {
-        var user = userService.findOrProvision("cap-u12", "cap-u12@example.com", "Cap U12");
+        var user = userService.findOrProvision("unknown", "cap-u12", "cap-u12@example.com", "Cap U12");
         var listId = UUID.fromString(createList("Learn List 12"));
 
         // first submission → NEEDS_RESOLUTION
@@ -319,7 +319,7 @@ class CaptureResourceTest {
     @Test
     @TestSecurity(user = "cap-u14")
     void crossUserResolveAttempt_failsWithNon2xx() {
-        var userA = userService.findOrProvision("cap-u14a", "cap-u14a@example.com", "Cap U14A");
+        var userA = userService.findOrProvision("unknown", "cap-u14a", "cap-u14a@example.com", "Cap U14A");
 
         // user A submits a capture via service (avoids HTTP security context switch)
         var result = captureService.submit(userA.userId(), "cap14 cross user test content xyz");

@@ -17,6 +17,10 @@
         </dependency>
         <dependency>
             <groupId>com.capsa</groupId>
+            <artifactId>capsa-bootstrap</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.capsa</groupId>
             <artifactId>capsa-lists</artifactId>
         </dependency>
         <dependency>

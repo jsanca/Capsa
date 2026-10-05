@@ -1,16 +1,21 @@
 package com.capsa.users.api;
 
 /**
- * Request-scoped binding that exposes the authenticated {@link UserId} for the
- * current execution context. Injected into capability code that needs to act
- * on behalf of the calling user without receiving the id as a parameter on
- * every operation.
+ * Request-scoped abstraction over the authenticated OIDC principal.
  *
- * <p>Implementations are provided by the authentication/integration layer;
- * domain code depends only on this interface.
+ * <p>{@link #userId()} triggers lazy find-or-provision of the application-level User.
+ * {@link #identity()} returns the raw verified claims without provisioning.
  */
 public interface CurrentUser {
-
-    /** Identifier of the authenticated user for the current request. */
+    /**
+     * Returns the application-level {@link UserId} for the authenticated user.
+     * Triggers find-or-provision on first call.
+     */
     UserId userId();
+
+    /**
+     * Returns the verified OIDC identity (issuer + subject) plus profile claims
+     * from the JWT, without triggering user provisioning.
+     */
+    ExternalIdentity identity();
 }
